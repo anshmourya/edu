@@ -17,6 +17,13 @@ const responseHandler = (req: Request, res: Response, next: NextFunction) => {
     });
   };
 
+  res.errorCreating = function (error = {}) {
+    res.status(400).json({
+      status: 'ERROR',
+      message: error.message || 'Error while creating',
+    });
+  };
+
   next();
 };
 

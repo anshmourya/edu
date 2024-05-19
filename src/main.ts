@@ -5,6 +5,7 @@ import cors from 'cors';
 import searchRouter from '@routes/search';
 import doubtRouter from '@routes/doubt';
 import responseHandler from 'service/response';
+import userHandler from '@routes/user';
 
 const app = express();
 const port = 3000;
@@ -13,6 +14,7 @@ app.use(express.json());
 app.use(responseHandler);
 app.use('/api/v1', searchRouter);
 app.use('/api/v1', doubtRouter);
+app.use('/api/v1', userHandler);
 
 database()
   .then(() => {
