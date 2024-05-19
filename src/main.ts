@@ -1,8 +1,6 @@
 import express from 'express';
 import 'dotenv/config';
-import { youtube } from '@config/youtube';
 import database from '@config/database';
-import { YoutubeTranscript } from 'youtube-transcript';
 import cors from 'cors';
 import searchRouter from '@routes/search';
 import doubtRouter from '@routes/doubt';
