@@ -16,16 +16,6 @@ app.use(responseHandler);
 app.use('/api/v1', searchRouter);
 app.use('/api/v1', doubtRouter);
 
-app.get('/', async (req, res) => {
-  const data = await youtube.videos.list({
-    part: ['snippet', 'contentDetails', 'statistics'],
-    id: ['NJhnXQ6tYhc'],
-  });
-  YoutubeTranscript.fetchTranscript(
-    'https://www.youtube.com/watch?v=NJhnXQ6tYhc',
-  ).then(console.log);
-  res.send(data);
-});
 database()
   .then(() => {
     app.listen(port, () =>
