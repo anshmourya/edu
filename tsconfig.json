@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "module": "ESNext",
+    "esModuleInterop": true,
+    "target": "es6",
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "outDir": "dist",
+    "baseUrl": "src/.",
+    "paths": {
+      "@config/*": ["config/*"],
+      "@controller/*": ["controller/*"],
+      "@routes/*": ["routes/*"],
+      "@schema/*": ["schema/*"],
+      "@middelware/*": ["middelware/*"],
+      "@utils/*": ["utils/*"],
+      "@type/*": ["type/*"]
+    }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"],
+  "lib": ["es2015"]
+  // "files": ["./src/types/global.type.ts"]
+}
