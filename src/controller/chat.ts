@@ -55,7 +55,7 @@ class Chat {
       // Construct query for AI answer
       const newQuery = [
         ...last5Messages.map((message) => ({
-          role: message.sender === 'user' ? 'user' : 'assistant',
+          role: message.sender,
           content: message.message,
         })),
         {
@@ -68,8 +68,10 @@ class Chat {
       const answer = await this.answerInText(newQuery);
 
       // Store user question and AI answer in the chat
-      await this.storeChatMessage(userId, conversation.id, 'user', question);
-      await this.storeChatMessage(userId, conversation.id, 'ai', answer);
+      await Promise.all([
+        this.storeChatMessage(userId, conversation.id, 'user', question),
+        this.storeChatMessage(userId, conversation.id, 'assistant', answer),
+      ]);
 
       res.success({
         message: 'Your answer',
@@ -85,7 +87,6 @@ class Chat {
   };
 
   answerInText = async (messages) => {
-    console.log(messages);
     const response = await openai.chat.completions.create({
       model: 'gpt-4',
       messages,
@@ -123,20 +124,30 @@ class Chat {
   };
 
   getLastMessages = async (conversationId, limit) => {
-    const allMessages = await ChatModal.find({
+    // Fetch the last `limit` user/assistant messages
+    const userAssistantMessages = await ChatModal.find({
       conversationId,
-      $or: [{ sender: { $ne: 'system' } }, { sender: 'system' }],
+      sender: { $ne: 'system' },
     })
       .sort({ timestamp: -1 })
       .limit(limit)
       .exec();
 
+    // Fetch the system message (if any)
+    const systemMessage = await ChatModal.findOne({
+      conversationId,
+      sender: 'system',
+    }).exec();
+
+    // Combine the messages
+    const allMessages = systemMessage
+      ? [systemMessage, ...userAssistantMessages]
+      : userAssistantMessages;
+
     // Sort by timestamp to ensure correct order
-    const sortedMessages = allMessages.sort(
+    return allMessages.sort(
       (a, b) => a.timestamp.getTime() - b.timestamp.getTime(),
     );
-
-    return sortedMessages;
   };
 
   summarizeText = async (text) => {
@@ -145,8 +156,9 @@ class Chat {
       messages: [
         {
           role: 'system',
-          content:
-            'Summarize the following text while retaining the key information.',
+          content: `You are a helpful assistant. Your task is to summarize the following video transcript. 
+                  Ensure that you include all key information and important points mentioned in the transcript. 
+                  The summary should be concise yet comprehensive, capturing the essence of the content without losing critical context.`,
         },
         {
           role: 'user',

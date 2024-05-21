@@ -23,6 +23,12 @@ const responseHandler = (req: Request, res: Response, next: NextFunction) => {
       message: error.message || 'Error while creating',
     });
   };
+  res.unathorized = function (error = {}) {
+    res.status(401).json({
+      status: 'ERROR',
+      message: error.message || 'Unauthorized',
+    });
+  };
 
   next();
 };
